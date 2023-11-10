@@ -29,3 +29,5 @@ data/**/*.tiff
 maps/*.map
 
 shaders/*.bin
+
+!build.sh
