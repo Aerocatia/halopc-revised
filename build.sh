@@ -11,6 +11,8 @@ BUILD_CAMPAIGN=1
 USE_RESOURCE_MAPS=0
 ENGINE_TARGET="none"
 
+echoerr() { printf "%s\n" "$*" >&2; }
+
 __usage="Usage: $(basename $0) -e <engine> [OPTIONS]
 
 Options:
@@ -57,7 +59,7 @@ while getopts ":d:he:l:m:npqrt:" arg; do
                     ENGINE_TARGET="${OPTARG}"
                 ;;
                 *)
-                    echo "Error: Unknown target engine \"$OPTARG\""
+                    echoerr "Error: Unknown target engine \"$OPTARG\""
                     exit 1
                 ;;
             esac
@@ -88,13 +90,13 @@ while getopts ":d:he:l:m:npqrt:" arg; do
                         true
                     ;;
                     *)
-                        echo "Error: Unknown Language \"$OPTARG\""
+                        echoerr "Error: Unknown Language \"$OPTARG\""
                         exit 1
                     ;;
                 esac
                 lang_set=1
             else
-                echo "Error: The language can only be set once"
+                echoerr "Error: The language can only be set once"
                 exit 1
             fi
         ;;
@@ -118,14 +120,14 @@ while getopts ":d:he:l:m:npqrt:" arg; do
             TAGS_DIRS=("${OPTARG}" "${TAGS_DIRS[@]}")
         ;;
         *)
-            echo "Error: Unkown option. use -h for supported options"
+            echoerr "Error: Unknown option. use -h for supported options"
             exit 1
         ;;
     esac
 done
 
 if [[ "$ENGINE_TARGET" == "none" ]]; then
-    echo "Error: A target engine was not given. Use -h for help"
+    echoerr "Error: A target engine was not given. Use -h for help"
     exit 1
 fi
 
@@ -137,7 +139,7 @@ elif command -v invader-build.exe &> /dev/null; then
 elif command -v ./invader-build.exe &> /dev/null; then
     CACHE_BUILDER=./invader-build.exe
 else
-    echo "Could not find invader-build in \$PATH or next to this script"
+    echoerr "Could not find invader-build in \$PATH or next to this script"
     exit 1
 fi
 
@@ -148,7 +150,7 @@ elif command -v invader-resource.exe &> /dev/null; then
 elif command -v ./invader-resource.exe &> /dev/null; then
     RESOURCE_BUILDER=./invader-resource.exe
 else
-    echo "Could not find invader-resource in \$PATH or next to this script"
+    echoerr "Could not find invader-resource in \$PATH or next to this script"
     exit 1
 fi
 
