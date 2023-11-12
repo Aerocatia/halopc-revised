@@ -81,13 +81,15 @@ while getopts ":d:he:l:m:npqrt:" arg; do
                     ;&
                     jp)
                     ;&
-                    kr)
-                    ;&
                     tw)
                         TAGS_DIRS=("loc/tags_${OPTARG}" "${TAGS_DIRS[@]}")
                     ;;
                     en)
                         true
+                    ;;
+                    kr)
+                        echoerr "The Korean Halo PC tagset is currently missing and can not be built"
+                        exit 1
                     ;;
                     *)
                         echoerr "Error: Unknown Language \"$OPTARG\""
