@@ -4,18 +4,22 @@ dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Defaults
 TAGS_DIRS=('tags')
+EXTRA_TAGS_DIRS=()
 DATA_DIR="data"
 MAPS_DIR="maps"
-BUILD_NEW_CE_RESOURCE_MAPS=0
-BUILD_CAMPAIGN=1
-USE_RESOURCE_MAPS=0
 ENGINE_TARGET="none"
+BUILD_NEW_RESOURCE_MAPS=0
+BUILD_EXTENDED_CE_RESOURCE_MAPS=0
+BUILD_CAMPAIGN=1
+USE_EXISTING_RESOURCE_MAPS=0
+USE_HD_BITMAPS=0
 
 echoerr() { printf "%s\n" "$*" >&2; }
 
 __usage="Usage: $(basename $0) -e <engine> [OPTIONS]
 
 Options:
+  -b            Use high resolution transparency and rasterizer bitmaps.
   -d <dir>      Change the data directory used for scripts.
   -e <engine>   Engine target (required) Valid options are: gbx-custom,
                 gbx-demo, gbx-retail.
@@ -23,11 +27,16 @@ Options:
   -l <lang>     Build a localization. Valid options are: de, es, fr, it, jp, kr,
                 tw, en (default).
   -m <dir>      Change the output maps directory.
-  -n            Make and use new resource maps when building for Custom Edition.
+  -n            Make and use new resource maps for shared data.
+                Warning: Compatibility will break with other maps that use
+                resource maps on engines other than Custom Edition.
   -p            Do not build the campaign maps.
   -q            Make invader-build be quiet.
   -r            Build against existing resource maps.
   -t            Prefix an extra tags directory (can be used more than once).
+  -x            Make extended resource maps for Custom Edition when using -n.
+                Warning: Campaign maps built this way will ONLY work with
+                these exact resource maps.
 "
 
 # Scenario basenames
@@ -44,8 +53,11 @@ MULTIPLAYER=("${MULTIPLAYER_XBOX[@]}" "${MULTIPLAYER_PC[@]}")
 
 # Options
 lang_set=0
-while getopts ":d:he:l:m:npqrt:" arg; do
+while getopts ":bd:he:l:m:npqrt:x" arg; do
     case "${arg}" in
+        b)
+            USE_HD_BITMAPS=1
+        ;;
         d)
             DATA_DIR="${OPTARG}"
         ;;
@@ -104,8 +116,7 @@ while getopts ":d:he:l:m:npqrt:" arg; do
             MAPS_DIR="${OPTARG}"
         ;;
         n)
-            BUILD_NEW_CE_RESOURCE_MAPS=1
-            USE_RESOURCE_MAPS=1
+            BUILD_NEW_RESOURCE_MAPS=1
         ;;
         p)
             BUILD_CAMPAIGN=0
@@ -114,10 +125,14 @@ while getopts ":d:he:l:m:npqrt:" arg; do
             INVADER_QUIET=1
         ;;
         r)
-            USE_RESOURCE_MAPS=1
+            USE_EXISTING_RESOURCE_MAPS=1
         ;;
         t)
-            TAGS_DIRS=("${OPTARG}" "${TAGS_DIRS[@]}")
+            # Flip it
+            EXTRA_TAGS_DIRS+=("${OPTARG}")
+        ;;
+        x)
+            BUILD_EXTENDED_CE_RESOURCE_MAPS=1
         ;;
         *)
             echoerr "Error: Unknown option. use -h for supported options"
@@ -157,56 +172,107 @@ fi
 # Make sure this exists
 mkdir -p "${MAPS_DIR}"
 
-# Build tags directory arguments
-TAGS_DIR_ARGS=()
-for T_PATH in "${TAGS_DIRS[@]}"; do
-    TAGS_DIR_ARGS+=("--tags" "${T_PATH}")
+# Set common build args
+BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
+
+# Add tags directory arguments
+for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
+    BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
 
-# Make new resource maps if custom edition
-if [[ $BUILD_NEW_CE_RESOURCE_MAPS == 1 && $ENGINE_TARGET == "gbx-custom" ]]; then
-    for i in bitmaps sounds loc; do
-        $RESOURCE_BUILDER --game-engine gbx-custom --type $i "${TAGS_DIR_ARGS[@]}"
-    done
+if [[ $USE_HD_BITMAPS == 1 ]]; then
+    BUILD_ARGS+=("--tags" "extra/tags_highres_bitmaps")
 fi
 
-# Use resource maps if enabled.
-if [[ $USE_RESOURCE_MAPS == 1 ]]; then
-        BASE_ARGS=("--game-engine" "$ENGINE_TARGET" "--resource-usage" "check")
-    else
-        BASE_ARGS=("--game-engine" "$ENGINE_TARGET" "--resource-usage" "none")
-fi
+for MT_PATH in "${TAGS_DIRS[@]}"; do
+    BUILD_ARGS+=("--tags" "${MT_PATH}")
+done
 
 # Quiet?
 if [[ $INVADER_QUIET == 1 ]]; then
-    BASE_ARGS=("${BASE_ARGS[@]}" "--quiet")
+    BUILD_ARGS+=("--quiet")
 fi
 
-# Campaign
-if [[ $BUILD_CAMPAIGN == 1 ]]; then
-    for s in "${CAMPAIGN[@]}"; do
-        $CACHE_BUILDER levels/$s/$s \
-            --data "${DATA_DIR}" \
-            --maps "${MAPS_DIR}" \
-            "${TAGS_DIR_ARGS[@]}" \
-            "${BASE_ARGS[@]}"
+# Use existing resource maps if enabled.
+if [[ $USE_EXISTING_RESOURCE_MAPS == 1 && $BUILD_NEW_RESOURCE_MAPS != 1 ]]; then
+        RESOURCE_ARGS=("--resource-usage" "check")
+    else
+        RESOURCE_ARGS=("--resource-usage" "none")
+fi
+
+# If making new resource maps for Custom Edition we make ones directly compatible
+# with stock unless stated otherwise. This is less efficient than full resource
+# maps, but we want to keep full compatibility with stock tag indices and ensure
+# that both existing maps work and new maps can still load with the original
+# released resource maps.
+
+if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $ENGINE_TARGET == "gbx-custom" && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 0 ]]; then
+    for i in bitmaps sounds loc; do
+        $RESOURCE_BUILDER --type $i "${BUILD_ARGS[@]}"
     done
+    RESOURCE_ARGS=("--resource-usage" "check")
 fi
 
-# MP (Stock Compat)
-for m in "${MULTIPLAYER[@]}"; do
-    $CACHE_BUILDER levels/test/$m/$m \
-        --auto-forge \
-        --data "${DATA_DIR}" \
-        --maps "${MAPS_DIR}" \
-        "${TAGS_DIR_ARGS[@]}" \
-        "${BASE_ARGS[@]}"
-done
+run_build() {
+    # Campaign
+    if [[ $BUILD_CAMPAIGN == 1 ]]; then
+        for s in "${CAMPAIGN[@]}"; do
+            $CACHE_BUILDER levels/$s/$s \
+                --data "${DATA_DIR}" \
+                "${BUILD_ARGS[@]}" \
+                "${RESOURCE_ARGS[@]}"
+        done
+    fi
 
-# UI
-$CACHE_BUILDER levels/ui/ui \
-    --data "${DATA_DIR}" \
-    --maps "${MAPS_DIR}" \
-    --forge-crc 0x73EE7229 \
-    "${TAGS_DIR_ARGS[@]}" \
-    "${BASE_ARGS[@]}"
+    # MP (Stock Compat)
+    for m in "${MULTIPLAYER[@]}"; do
+        $CACHE_BUILDER levels/test/$m/$m \
+            --auto-forge \
+            --data "${DATA_DIR}" \
+            "${BUILD_ARGS[@]}" \
+            "${RESOURCE_ARGS[@]}"
+    done
+
+    # UI
+    $CACHE_BUILDER levels/ui/ui \
+        --forge-crc 0x73EE7229 \
+        --data "${DATA_DIR}" \
+        "${BUILD_ARGS[@]}" \
+        "${RESOURCE_ARGS[@]}"
+}
+
+# Build here.
+run_build
+
+# If making new resource maps and NOT Custom Edition, then make them based on the
+# first build and do a second pass. This will break compatibility with exising
+# custom maps that depend on exact resource data offsets, as was the case with the
+# original retail game localizations. If it's requested on Custom Edition with -x
+# then we say call the cops and do it anyway. In this case the campaign maps will
+# hard depend on these exact resource maps.
+
+if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 1 ]]; then
+    BUILT_MAPS=("${MULTIPLAYER[@]}" "ui")
+    if [[ $BUILD_CAMPAIGN == 1 ]]; then
+        BUILT_MAPS+=("${CAMPAIGN[@]}")
+    fi
+
+    MAP_ARGS=()
+    for MAPNAME in "${BUILT_MAPS[@]}"; do
+        MAP_ARGS+=("--with-map" "${MAPS_DIR}/${MAPNAME}.map")
+    done
+
+    RESOURCE_TYPES=("bitmaps" "sounds")
+    if [[ $ENGINE_TARGET == "gbx-custom" ]]; then
+        RESOURCE_TYPES+=("loc")
+    fi
+
+    for RESOURCE_TYPE in "${RESOURCE_TYPES[@]}"; do
+        $RESOURCE_BUILDER --type "$RESOURCE_TYPE" "${BUILD_ARGS[@]}" "${MAP_ARGS[@]}"
+    done
+
+    RESOURCE_ARGS=("--resource-usage" "check")
+
+    # Second pass
+    run_build
+fi
