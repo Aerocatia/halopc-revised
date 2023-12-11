@@ -8,7 +8,7 @@ This project does not set out to make changes that affect the playstyle or atmos
 Instead the goal is to fix bugs that occurred during the Halo PC porting process.
 
 ## Difference from Halo CE "Refined"
-Unlike the Refined tagset, this asset release does not use workarounds or hacks to try and
+Unlike the Refined tagset, by default this asset release does not use workarounds or hacks to try and
 imitate the visuals of the Xbox version on Halo PC's buggy engine, instead this release
 fixes bugs with the Halo PC content while keeping within the intended tag features of Halo PC.
 

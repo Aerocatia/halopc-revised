@@ -13,6 +13,7 @@ BUILD_EXTENDED_CE_RESOURCE_MAPS=0
 BUILD_CAMPAIGN=1
 USE_EXISTING_RESOURCE_MAPS=0
 USE_HD_BITMAPS=0
+USE_DIRTY_TAG_WORKAROUNDS=0
 
 echoerr() { printf "%s\n" "$*" >&2; }
 
@@ -37,7 +38,13 @@ Options:
   -x            Make extended resource maps for Custom Edition when using -n.
                 Warning: Campaign maps built this way will ONLY work with
                 these exact resource maps.
-"
+  -z            Use BROKEN tags to work around incorrect tag functionality on the
+                Gearbox engines. These tags rely on gearbox engine bugs and *will*
+                break on an engine or mod that fixes them, like MCC running in
+                Custom Edition mode. If we ever escape this purgatory where MCC is
+                broken and worse feature-wise while the Gearbox port is also still
+                riddled with bugs, then this option and the associated tags should
+                be blasted into the sun."
 
 # Scenario basenames
 CAMPAIGN=('a10' 'a30' 'a50' 'b30' 'b40' 'c10' 'c20' 'c40' 'd20' 'd40')
@@ -53,7 +60,7 @@ MULTIPLAYER=("${MULTIPLAYER_XBOX[@]}" "${MULTIPLAYER_PC[@]}")
 
 # Options
 lang_set=0
-while getopts ":bd:he:l:m:npqrt:x" arg; do
+while getopts ":bd:he:l:m:npqrt:xz" arg; do
     case "${arg}" in
         b)
             USE_HD_BITMAPS=1
@@ -134,6 +141,9 @@ while getopts ":bd:he:l:m:npqrt:x" arg; do
         x)
             BUILD_EXTENDED_CE_RESOURCE_MAPS=1
         ;;
+        z)
+            USE_DIRTY_TAG_WORKAROUNDS=1
+        ;;
         *)
             echoerr "Error: Unknown option. use -h for supported options"
             exit 1
@@ -179,6 +189,10 @@ BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
 for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
+
+if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
+    BUILD_ARGS+=("--tags" "extra/tags_engine_workarounds")
+fi
 
 if [[ $USE_HD_BITMAPS == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_highres_bitmaps")
