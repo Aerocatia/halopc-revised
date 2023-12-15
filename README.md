@@ -23,6 +23,7 @@ Cache files (maps) can be compiled for the following engines from these tags:
 - Halo PC (2003 retail)
 - Halo Trial
 - Halo Custom Edition
+- Halo: The Master Chief Collection
 
 ## Directory Layout
 ### `/data`
@@ -38,6 +39,8 @@ Because of this it is not recommended to use these tags in maps that will not re
 when the related bugs can be fixed at the engine level. The workarounds in here are similar to the ones used in the "refined" tagset.
 ### `/extra/tags_highres_bitmaps`
 Faithful high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
+### `/extra/tags_mcc_compatibility`
+Tags that account for the differences in how MCC interprets HUD scale.
 
 ## Notice
 This tagset does not use any tags directly copied from the Halo MCC CE editing tools. Instead all data is derived

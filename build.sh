@@ -75,6 +75,8 @@ while getopts ":bd:he:l:m:npqrt:xz" arg; do
                 gbx-demo)
                 ;&
                 gbx-retail)
+                ;&
+                mcc-cea)
                     ENGINE_TARGET="${OPTARG}"
                 ;;
                 *)
@@ -159,10 +161,13 @@ fi
 # Find Invader
 if command -v invader-build &> /dev/null; then
     CACHE_BUILDER=invader-build
+    W32_CB=0
 elif command -v invader-build.exe &> /dev/null; then
     CACHE_BUILDER=invader-build.exe
+    W32_CB=1
 elif command -v ./invader-build.exe &> /dev/null; then
     CACHE_BUILDER=./invader-build.exe
+    W32_CB=1
 else
     echoerr "Could not find invader-build in \$PATH or next to this script"
     exit 1
@@ -170,17 +175,36 @@ fi
 
 if command -v invader-resource &> /dev/null; then
     RESOURCE_BUILDER=invader-resource
+    W32_RB=0
 elif command -v invader-resource.exe &> /dev/null; then
     RESOURCE_BUILDER=invader-resource.exe
+    W32_RB=1
 elif command -v ./invader-resource.exe &> /dev/null; then
     RESOURCE_BUILDER=./invader-resource.exe
+    W32_RB=1
 else
     echoerr "Could not find invader-resource in \$PATH or next to this script"
     exit 1
 fi
 
+if [[ $W32_CB != $W32_RB ]]; then
+    echoerr "Mixed Windows and non-Windows invader tools are not supported by this script"
+    exit 1
+fi
+
+if [[ $W32_CB == 1 ]]; then
+    if command -v wslpath &> /dev/null; then
+        MAPS_DIR_NIX=$(wslpath "${MAPS_DIR}")
+    else
+        echoerr "Usage of the windows tools are only supported on WSL"
+        exit 1
+    fi
+else
+    MAPS_DIR_NIX="${MAPS_DIR}"
+fi
+
 # Make sure this exists
-mkdir -p "${MAPS_DIR}"
+mkdir -p "${MAPS_DIR_NIX}"
 
 # Set common build args
 BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
@@ -189,6 +213,11 @@ BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
 for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
+
+if [[ "$ENGINE_TARGET" == "mcc-cea" ]]; then
+    # Load these in if building for MCC
+    BUILD_ARGS+=("--tags" "extra/tags_mcc_compatibility")
+fi
 
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_engine_workarounds")
@@ -263,7 +292,8 @@ run_build
 # custom maps that depend on exact resource data offsets, as was the case with the
 # original retail game localizations. If it's requested on Custom Edition with -x
 # then we say call the cops and do it anyway. In this case the campaign maps will
-# hard depend on these exact resource maps.
+# hard depend on these exact resource maps, but properly indexed MP maps should
+# still work (a rare few are not due to tool.exe bugs).
 
 if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 1 ]]; then
     BUILT_MAPS=("${MULTIPLAYER[@]}" "ui")
