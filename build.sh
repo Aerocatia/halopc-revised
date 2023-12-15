@@ -23,7 +23,7 @@ Options:
   -b            Use high resolution transparency and rasterizer bitmaps.
   -d <dir>      Change the data directory used for scripts.
   -e <engine>   Engine target (required) Valid options are: gbx-custom,
-                gbx-demo, gbx-retail.
+                gbx-demo, gbx-retail, mcc-cea.
   -h            Show this help text.
   -l <lang>     Build a localization. Valid options are: de, es, fr, it, jp, kr,
                 tw, en (default).
