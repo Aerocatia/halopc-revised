@@ -169,7 +169,7 @@ elif command -v ./invader-build.exe &> /dev/null; then
     CACHE_BUILDER=./invader-build.exe
     W32_CB=1
 else
-    echoerr "Could not find invader-build in \$PATH or next to this script"
+    echoerr "Error: Could not find invader-build in \$PATH or next to this script"
     exit 1
 fi
 
@@ -183,12 +183,12 @@ elif command -v ./invader-resource.exe &> /dev/null; then
     RESOURCE_BUILDER=./invader-resource.exe
     W32_RB=1
 else
-    echoerr "Could not find invader-resource in \$PATH or next to this script"
+    echoerr "Error: Could not find invader-resource in \$PATH or next to this script"
     exit 1
 fi
 
 if [[ $W32_CB != $W32_RB ]]; then
-    echoerr "Mixed Windows and non-Windows invader tools are not supported by this script"
+    echoerr "Error: Mixed Windows and non-Windows invader tools are not supported by this script"
     exit 1
 fi
 
@@ -196,7 +196,7 @@ if [[ $W32_CB == 1 ]]; then
     if command -v wslpath &> /dev/null; then
         MAPS_DIR_NIX=$(wslpath "${MAPS_DIR}")
     else
-        echoerr "Usage of the windows tools are only supported on WSL"
+        echoerr "Error: Usage of the windows tools are only supported on WSL"
         exit 1
     fi
 else
