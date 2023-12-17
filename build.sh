@@ -14,6 +14,7 @@ BUILD_CAMPAIGN=1
 USE_EXISTING_RESOURCE_MAPS=0
 USE_HD_BITMAPS=0
 USE_DIRTY_TAG_WORKAROUNDS=0
+INVADER_QUIET=0
 
 echoerr() { printf "%s\n" "$*" >&2; }
 
@@ -29,7 +30,7 @@ Options:
                 tw, en (default).
   -m <dir>      Change the output maps directory.
   -n            Make and use new resource maps for shared data.
-                Warning: Compatibility will break with other maps that use
+                WARNING: Compatibility will break with other maps that use
                 resource maps on engines other than Custom Edition.
   -p            Do not build the campaign maps.
   -q            Make invader-build be quiet.
@@ -147,7 +148,7 @@ while getopts ":bd:he:l:m:npqrt:xz" arg; do
             USE_DIRTY_TAG_WORKAROUNDS=1
         ;;
         *)
-            echoerr "Error: Unknown option. use -h for supported options"
+            echoerr "Error: Incorrect usage. use -h for supported options"
             exit 1
         ;;
     esac
@@ -231,6 +232,9 @@ for MT_PATH in "${TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${MT_PATH}")
 done
 
+# Split these off here because "--quiet" is not a valid argument for invader-resource.
+RESOURCE_BUILD_ARGS=("${BUILD_ARGS[@]}")
+
 # Quiet?
 if [[ $INVADER_QUIET == 1 ]]; then
     BUILD_ARGS+=("--quiet")
@@ -245,15 +249,19 @@ fi
 
 # If making new resource maps for Custom Edition we make ones directly compatible
 # with stock unless stated otherwise. This is less efficient than full resource
-# maps, but we want to keep full compatibility with stock tag indices and ensure
-# that both existing maps work and new maps can still load with the original
-# released resource maps.
+# maps, but by default we want to ensure that new maps built against them can still
+# load with the original Gearbox resource maps.
 
-if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $ENGINE_TARGET == "gbx-custom" && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 0 ]]; then
-    for i in bitmaps sounds loc; do
-        $RESOURCE_BUILDER --type $i "${BUILD_ARGS[@]}"
-    done
-    RESOURCE_ARGS=("--resource-usage" "check")
+BUILD_FULL_RESOURCE_MAPS=0
+if [[ $BUILD_NEW_RESOURCE_MAPS == 1 ]]; then
+    if [[ $ENGINE_TARGET == "gbx-custom" && $BUILD_EXTENDED_CE_RESOURCE_MAPS != 1 ]]; then
+        for i in bitmaps sounds loc; do
+            $RESOURCE_BUILDER --type $i "${RESOURCE_BUILD_ARGS[@]}"
+        done
+        RESOURCE_ARGS=("--resource-usage" "check")
+    else
+        BUILD_FULL_RESOURCE_MAPS=1
+    fi
 fi
 
 run_build() {
@@ -287,15 +295,12 @@ run_build() {
 # Build here.
 run_build
 
-# If making new resource maps and NOT Custom Edition, then make them based on the
-# first build and do a second pass. This will break compatibility with exising
-# custom maps that depend on exact resource data offsets, as was the case with the
-# original retail game localizations. If it's requested on Custom Edition with -x
-# then we say call the cops and do it anyway. In this case the campaign maps will
-# hard depend on these exact resource maps, but properly indexed MP maps should
-# still work (a rare few are not due to tool.exe bugs).
+# If requested we make new resource maps using the maps we just built as a source
+# for used tags. We then compile everything again against these with a second pass.
+# The maps created here will hard-depend on these exact resource maps to run, so by
+# default we do not do this for Halo Custom Edition.
 
-if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 1 ]]; then
+if [[ $BUILD_FULL_RESOURCE_MAPS == 1 ]]; then
     BUILT_MAPS=("${MULTIPLAYER[@]}" "ui")
     if [[ $BUILD_CAMPAIGN == 1 ]]; then
         BUILT_MAPS+=("${CAMPAIGN[@]}")
@@ -312,7 +317,7 @@ if [[ $BUILD_NEW_RESOURCE_MAPS == 1 && $BUILD_EXTENDED_CE_RESOURCE_MAPS == 1 ]];
     fi
 
     for RESOURCE_TYPE in "${RESOURCE_TYPES[@]}"; do
-        $RESOURCE_BUILDER --type "$RESOURCE_TYPE" "${BUILD_ARGS[@]}" "${MAP_ARGS[@]}"
+        $RESOURCE_BUILDER --type "$RESOURCE_TYPE" "${RESOURCE_BUILD_ARGS[@]}" "${MAP_ARGS[@]}"
     done
 
     RESOURCE_ARGS=("--resource-usage" "check")
