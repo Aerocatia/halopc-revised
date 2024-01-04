@@ -39,6 +39,9 @@ Because of this it is not recommended to use these tags in maps that will not re
 when the related bugs can be fixed at the engine level. The workarounds in here are similar to the ones used in the "refined" tagset.
 ### `/extra/tags_highres_bitmaps`
 Faithful high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
+### `/extra/tags_highres_hud`
+A high resolution version of the classic Halo HUD. This version is based on content originally made by Jesse (Holy Crust).
+Note that not all elements of the HUD can be high resolution due to limitations in Halo PC/Halo Custom Edition.
 ### `/extra/tags_mcc_compatibility`
 Tags that account for the differences in how MCC interprets HUD scale.
 

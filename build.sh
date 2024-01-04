@@ -2,7 +2,7 @@
 
 dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
-# Defaults
+# Defaults.
 TAGS_DIRS=('tags')
 EXTRA_TAGS_DIRS=()
 DATA_DIR="data"
@@ -13,6 +13,7 @@ BUILD_EXTENDED_CE_RESOURCE_MAPS=0
 BUILD_CAMPAIGN=1
 USE_EXISTING_RESOURCE_MAPS=0
 USE_HD_BITMAPS=0
+USE_HD_HUD=0
 USE_DIRTY_TAG_WORKAROUNDS=0
 INVADER_QUIET=0
 
@@ -26,6 +27,7 @@ Options:
   -e <engine>   Engine target (required) Valid options are: gbx-custom,
                 gbx-demo, gbx-retail, mcc-cea.
   -h            Show this help text.
+  -j            Use the high resolution Halo HUD.
   -l <lang>     Build a localization. Valid options are: de, es, fr, it, jp, kr,
                 tw, en (default).
   -m <dir>      Change the output maps directory.
@@ -47,7 +49,7 @@ Options:
                 riddled with bugs, then this option and the associated tags should
                 be blasted into the sun."
 
-# Scenario basenames
+# Scenario basenames.
 CAMPAIGN=('a10' 'a30' 'a50' 'b30' 'b40' 'c10' 'c20' 'c40' 'd20' 'd40')
 
 MULTIPLAYER_XBOX=('beavercreek' 'bloodgulch' 'boardingaction' 'carousel' 'chillout'
@@ -59,9 +61,9 @@ MULTIPLAYER_PC=('dangercanyon' 'deathisland' 'gephyrophobia' 'icefields'
 
 MULTIPLAYER=("${MULTIPLAYER_XBOX[@]}" "${MULTIPLAYER_PC[@]}")
 
-# Options
+# Options.
 lang_set=0
-while getopts ":bd:he:l:m:npqrt:xz" arg; do
+while getopts ":bd:he:jl:m:npqrt:xz" arg; do
     case "${arg}" in
         b)
             USE_HD_BITMAPS=1
@@ -89,6 +91,9 @@ while getopts ":bd:he:l:m:npqrt:xz" arg; do
         h)
             echo "$__usage"
             exit
+        ;;
+        j)
+            USE_HD_HUD=1
         ;;
         l)
             if [[ $lang_set != 1 ]]; then
@@ -159,7 +164,7 @@ if [[ "$ENGINE_TARGET" == "none" ]]; then
     exit 1
 fi
 
-# Find Invader
+# Find Invader.
 if command -v invader-build &> /dev/null; then
     CACHE_BUILDER=invader-build
     W32_CB=0
@@ -204,26 +209,44 @@ else
     MAPS_DIR_NIX="${MAPS_DIR}"
 fi
 
-# Make sure this exists
+# Make sure this exists.
 mkdir -p "${MAPS_DIR_NIX}"
 
-# Set common build args
+# Set common build args.
 BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
 
-# Add tags directory arguments
+#
+# Build tags directory arguments.
+# Load order matters here, tags for the the HD HUD must be loaded over top of tags
+# for things like engine workarounds.
+#
+
+# User provided tags directories.
 for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
 
-if [[ "$ENGINE_TARGET" == "mcc-cea" ]]; then
-    # Load these in if building for MCC
-    BUILD_ARGS+=("--tags" "extra/tags_mcc_compatibility")
+# Main tags for HD HUD.
+if [[ $USE_HD_HUD == 1 ]]; then
+    BUILD_ARGS+=("--tags" "extra/tags_highres_hud")
 fi
 
+# Load these in if building for MCC.
+if [[ "$ENGINE_TARGET" == "mcc-cea" ]]; then
+    if [[ $USE_HD_HUD == 1 ]]; then
+        echoerr "Error: Support for the HD HUD on the MCC build target is not implemented in this tagset"
+        exit 1
+    else
+        BUILD_ARGS+=("--tags" "extra/tags_mcc_compatibility")
+    fi
+fi
+
+# Base Gearbox tag workarounds.
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_engine_workarounds")
 fi
 
+# Simple HD bitmaps.
 if [[ $USE_HD_BITMAPS == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_highres_bitmaps")
 fi
@@ -265,7 +288,7 @@ if [[ $BUILD_NEW_RESOURCE_MAPS == 1 ]]; then
 fi
 
 run_build() {
-    # Campaign
+    # Campaign.
     if [[ $BUILD_CAMPAIGN == 1 ]]; then
         for s in "${CAMPAIGN[@]}"; do
             $CACHE_BUILDER levels/$s/$s \
@@ -322,6 +345,6 @@ if [[ $BUILD_FULL_RESOURCE_MAPS == 1 ]]; then
 
     RESOURCE_ARGS=("--resource-usage" "check")
 
-    # Second pass
+    # Second pass.
     run_build
 fi
