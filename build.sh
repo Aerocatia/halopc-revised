@@ -243,7 +243,7 @@ fi
 
 # Base Gearbox tag workarounds.
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/tags_engine_workarounds")
+    BUILD_ARGS+=("--tags" "extra/workarounds/tags_engine_workarounds")
 fi
 
 # Simple HD bitmaps.
