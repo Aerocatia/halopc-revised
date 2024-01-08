@@ -45,6 +45,8 @@ These tags work around engine bugs in the Gearbox version of the game in order t
 Maps built with these tags will not work correctly on less broken engines like MCC or if the bugs can be fixed through engine mods.
 Because of this it is not recommended to use these tags in maps that will not receive updates, and they will be removed from this repo
 when the related bugs can be fixed at the engine level. The workarounds in here are similar to the ones used in the "refined" tagset.
+### `/extra/workarounds/tags_highres_hud_workarounds`
+Workarounds for the high resolution HUD tags. This includes 2X resolution HUD numbers (needs Chimera for waypoints to not look broken) and a workaround for the sniper ticks.
 
 ## Notice
 This tagset does not use any tags directly copied from the Halo MCC CE editing tools. Instead all data is derived
