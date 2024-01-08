@@ -226,6 +226,11 @@ for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
 
+# Workarounds for HD HUD.
+if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 && $USE_HD_HUD == 1 ]]; then
+    BUILD_ARGS+=("--tags" "extra/workarounds/tags_highres_hud_workarounds")
+fi
+
 # Main tags for HD HUD.
 if [[ $USE_HD_HUD == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_highres_hud")
