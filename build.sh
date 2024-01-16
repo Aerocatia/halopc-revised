@@ -3,11 +3,12 @@
 dir="$(cd -P -- "$(dirname -- "${BASH_SOURCE[0]}")" && pwd -P)"
 
 # Defaults.
-TAGS_DIRS=('tags')
+BASE_TAGS_DIR="tags"
 EXTRA_TAGS_DIRS=()
 DATA_DIR="data"
 MAPS_DIR="maps"
-ENGINE_TARGET="none"
+TARGET_ENGINE="none"
+TARGET_LANGUAGE="en"
 BUILD_NEW_RESOURCE_MAPS=0
 BUILD_EXTENDED_CE_RESOURCE_MAPS=0
 BUILD_CAMPAIGN=1
@@ -24,7 +25,7 @@ __usage="Usage: $(basename $0) -e <engine> [OPTIONS]
 Options:
   -b            Use high resolution transparency and rasterizer bitmaps.
   -d <dir>      Change the data directory used for scripts.
-  -e <engine>   Engine target (required) Valid options are: gbx-custom,
+  -g <engine>   Engine target (required) Valid options are: gbx-custom,
                 gbx-demo, gbx-retail, mcc-cea.
   -h            Show this help text.
   -j            Use the high resolution Halo HUD.
@@ -63,7 +64,7 @@ MULTIPLAYER=("${MULTIPLAYER_XBOX[@]}" "${MULTIPLAYER_PC[@]}")
 
 # Options.
 lang_set=0
-while getopts ":bd:he:jl:m:npqrt:xz" arg; do
+while getopts ":bd:g:hjl:m:npqrt:xz" arg; do
     case "${arg}" in
         b)
             USE_HD_BITMAPS=1
@@ -71,7 +72,7 @@ while getopts ":bd:he:jl:m:npqrt:xz" arg; do
         d)
             DATA_DIR="${OPTARG}"
         ;;
-        e)
+        g)
             case "${OPTARG}" in
                 gbx-custom)
                 ;&
@@ -80,7 +81,7 @@ while getopts ":bd:he:jl:m:npqrt:xz" arg; do
                 gbx-retail)
                 ;&
                 mcc-cea)
-                    ENGINE_TARGET="${OPTARG}"
+                    TARGET_ENGINE="${OPTARG}"
                 ;;
                 *)
                     echoerr "Error: Unknown target engine \"$OPTARG\""
@@ -97,24 +98,8 @@ while getopts ":bd:he:jl:m:npqrt:xz" arg; do
         ;;
         l)
             if [[ $lang_set != 1 ]]; then
-                case "${OPTARG}" in
-                    de)
-                    ;&
-                    es)
-                    ;&
-                    fr)
-                    ;&
-                    it)
-                    ;&
-                    jp)
-                    ;&
-                    kr)
-                    ;&
-                    tw)
-                        TAGS_DIRS=("loc/tags_${OPTARG}" "${TAGS_DIRS[@]}")
-                    ;;
-                    en)
-                        true
+                case "${OPTARG}" in de) ;& en) ;& es) ;& fr) ;& it) ;& jp) ;& kr) ;& tw)
+                        TARGET_LANGUAGE="${OPTARG}"
                     ;;
                     *)
                         echoerr "Error: Unknown Language \"$OPTARG\""
@@ -159,7 +144,7 @@ while getopts ":bd:he:jl:m:npqrt:xz" arg; do
     esac
 done
 
-if [[ "$ENGINE_TARGET" == "none" ]]; then
+if [[ "$TARGET_ENGINE" == "none" ]]; then
     echoerr "Error: A target engine was not given. Use -h for help"
     exit 1
 fi
@@ -213,7 +198,7 @@ fi
 mkdir -p "${MAPS_DIR_NIX}"
 
 # Set common build args.
-BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$ENGINE_TARGET")
+BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$TARGET_ENGINE")
 
 #
 # Build tags directory arguments.
@@ -226,6 +211,14 @@ for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
 
+# localized bitmaps for HD HUD.
+if [[ $USE_HD_HUD == 1 ]]; then
+    case "${TARGET_LANGUAGE}" in es)
+            BUILD_ARGS+=("--tags" "extra/loc_highres_hud/tags_${TARGET_LANGUAGE}")
+        ;;
+    esac
+fi
+
 # Workarounds for HD HUD.
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 && $USE_HD_HUD == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/workarounds/tags_highres_hud_workarounds")
@@ -237,7 +230,7 @@ if [[ $USE_HD_HUD == 1 ]]; then
 fi
 
 # Load these in if building for MCC.
-if [[ "$ENGINE_TARGET" == "mcc-cea" ]]; then
+if [[ "$TARGET_ENGINE" == "mcc-cea" ]]; then
     if [[ $USE_HD_HUD == 1 ]]; then
         echoerr "Error: Support for the HD HUD on the MCC build target is not implemented in this tagset"
         exit 1
@@ -256,9 +249,13 @@ if [[ $USE_HD_BITMAPS == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/tags_highres_bitmaps")
 fi
 
-for MT_PATH in "${TAGS_DIRS[@]}"; do
-    BUILD_ARGS+=("--tags" "${MT_PATH}")
-done
+# Base localization tags.
+if [[ "$TARGET_LANGUAGE" != "en" ]]; then
+    BUILD_ARGS+=("--tags" "loc/tags_${TARGET_LANGUAGE}")
+fi
+
+# Base tags directory, usually just "tags".
+BUILD_ARGS+=("--tags" "${BASE_TAGS_DIR}")
 
 # Split these off here because "--quiet" is not a valid argument for invader-resource.
 RESOURCE_BUILD_ARGS=("${BUILD_ARGS[@]}")
@@ -282,7 +279,7 @@ fi
 
 BUILD_FULL_RESOURCE_MAPS=0
 if [[ $BUILD_NEW_RESOURCE_MAPS == 1 ]]; then
-    if [[ $ENGINE_TARGET == "gbx-custom" && $BUILD_EXTENDED_CE_RESOURCE_MAPS != 1 ]]; then
+    if [[ $TARGET_ENGINE == "gbx-custom" && $BUILD_EXTENDED_CE_RESOURCE_MAPS != 1 ]]; then
         for i in bitmaps sounds loc; do
             $RESOURCE_BUILDER --type $i "${RESOURCE_BUILD_ARGS[@]}"
         done
@@ -340,7 +337,7 @@ if [[ $BUILD_FULL_RESOURCE_MAPS == 1 ]]; then
     done
 
     RESOURCE_TYPES=("bitmaps" "sounds")
-    if [[ $ENGINE_TARGET == "gbx-custom" ]]; then
+    if [[ $TARGET_ENGINE == "gbx-custom" ]]; then
         RESOURCE_TYPES+=("loc")
     fi
 
