@@ -213,7 +213,7 @@ done
 
 # localized bitmaps for HD HUD.
 if [[ $USE_HD_HUD == 1 ]]; then
-    case "${TARGET_LANGUAGE}" in es)
+    case "${TARGET_LANGUAGE}" in de) ;& es) ;& fr) ;& it)
             BUILD_ARGS+=("--tags" "extra/loc_highres_hud/tags_${TARGET_LANGUAGE}")
         ;;
     esac
