@@ -13,6 +13,7 @@ BUILD_NEW_RESOURCE_MAPS=0
 BUILD_EXTENDED_CE_RESOURCE_MAPS=0
 BUILD_CAMPAIGN=1
 USE_EXISTING_RESOURCE_MAPS=0
+USE_TAG_SCRIPT_SOURCE=0
 USE_HD_BITMAPS=0
 USE_HD_HUD=0
 USE_DIRTY_TAG_WORKAROUNDS=0
@@ -38,6 +39,7 @@ Options:
   -p            Do not build the campaign maps.
   -q            Make invader-build be quiet.
   -r            Build against existing resource maps.
+  -s            Use the scenario tags for script source.
   -t            Prefix an extra tags directory (can be used more than once).
   -x            Make extended resource maps for Custom Edition when using -n.
                 Warning: Campaign maps built this way will ONLY work with
@@ -64,7 +66,7 @@ MULTIPLAYER=("${MULTIPLAYER_XBOX[@]}" "${MULTIPLAYER_PC[@]}")
 
 # Options.
 lang_set=0
-while getopts ":bd:g:hjl:m:npqrt:xz" arg; do
+while getopts ":bd:g:hjl:m:npqrst:xz" arg; do
     case "${arg}" in
         b)
             USE_HD_BITMAPS=1
@@ -126,6 +128,9 @@ while getopts ":bd:g:hjl:m:npqrt:xz" arg; do
         ;;
         r)
             USE_EXISTING_RESOURCE_MAPS=1
+        ;;
+        s)
+            USE_TAG_SCRIPT_SOURCE=1
         ;;
         t)
             # Flip it
@@ -257,8 +262,13 @@ fi
 # Base tags directory, usually just "tags".
 BUILD_ARGS+=("--tags" "${BASE_TAGS_DIR}")
 
-# Split these off here because "--quiet" is not a valid argument for invader-resource.
+# Split these off here because "--quiet" and "--script-source" are not valid arguments for invader-resource.
 RESOURCE_BUILD_ARGS=("${BUILD_ARGS[@]}")
+
+# Scripts from the scenario tags?
+if [[ $USE_TAG_SCRIPT_SOURCE == 1 ]]; then
+    BUILD_ARGS+=("--script-source" "tags")
+fi
 
 # Quiet?
 if [[ $INVADER_QUIET == 1 ]]; then
