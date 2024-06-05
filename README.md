@@ -33,7 +33,8 @@ The base English Halo PC tagset with numerous bugfixes. This is a standalone tag
 ### `/loc/tags{de,es,fr,it,jp,kr,tw}`
 The translated game data for Halo PC.
 ### `/extra/tags_highres_bitmaps`
-Faithful high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
+Faithful custom high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
+Also contains slightly higher resolution versions of bitmaps made by bungie that were used elsewhere (Xbox 1749, other parts of the final tagset).
 ### `/extra/tags_highres_hud`
 A high resolution version of the classic Halo HUD. This version is based on content originally made by Jesse (Holy Crust).
 Note that not all elements of the HUD can be high resolution due to limitations in Halo PC/Halo Custom Edition.
