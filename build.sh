@@ -219,19 +219,19 @@ done
 # localized bitmaps for HD HUD.
 if [[ $USE_HD_HUD == 1 ]]; then
     case "${TARGET_LANGUAGE}" in de) ;& es) ;& fr) ;& it)
-            BUILD_ARGS+=("--tags" "extra/loc_highres_hud/tags_${TARGET_LANGUAGE}")
+            BUILD_ARGS+=("--tags" "extra/highres_hud/loc/${TARGET_LANGUAGE}/tags")
         ;;
     esac
 fi
 
 # Workarounds for HD HUD.
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 && $USE_HD_HUD == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/workarounds/tags_highres_hud_workarounds")
+    BUILD_ARGS+=("--tags" "extra/engine_workarounds/highres_hud/tags")
 fi
 
 # Main tags for HD HUD.
 if [[ $USE_HD_HUD == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/tags_highres_hud")
+    BUILD_ARGS+=("--tags" "extra/highres_hud/tags")
 fi
 
 # Load these in if building for MCC.
@@ -240,23 +240,23 @@ if [[ "$TARGET_ENGINE" == "mcc-cea" ]]; then
         echoerr "Error: Support for the HD HUD on the MCC build target is not implemented in this tagset"
         exit 1
     else
-        BUILD_ARGS+=("--tags" "extra/tags_mcc_compatibility")
+        BUILD_ARGS+=("--tags" "extra/mcc_compatibility/tags")
     fi
 fi
 
 # Base Gearbox tag workarounds.
 if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/workarounds/tags_engine_workarounds")
+    BUILD_ARGS+=("--tags" "extra/engine_workarounds/general/tags")
 fi
 
 # Simple HD bitmaps.
 if [[ $USE_HD_BITMAPS == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/tags_highres_bitmaps")
+    BUILD_ARGS+=("--tags" "extra/highres_bitmaps/tags")
 fi
 
 # Base localization tags.
 if [[ "$TARGET_LANGUAGE" != "en" ]]; then
-    BUILD_ARGS+=("--tags" "loc/tags_${TARGET_LANGUAGE}")
+    BUILD_ARGS+=("--tags" "loc/${TARGET_LANGUAGE}/tags")
 fi
 
 # Base tags directory, usually just "tags".
