@@ -30,23 +30,25 @@ Cache files (maps) can be compiled for the following engines from these tags:
 HSC script source for Halo PC.
 ### `/tags`
 The base English Halo PC tagset with numerous bugfixes. This is a standalone tagset in which the other below variants can be optionally applied to.
-### `/loc/tags{de,es,fr,it,jp,kr,tw}`
+### `/loc/{de,es,fr,it,jp,kr,tw}/tags`
 The translated game data for Halo PC.
-### `/extra/tags_highres_bitmaps`
+### `/extra/highres_bitmaps/tags`
 Faithful custom high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
 Also contains slightly higher resolution versions of bitmaps made by bungie that were used elsewhere (Xbox 1749, other parts of the final tagset).
-### `/extra/tags_highres_hud`
+### `/extra/highres_hud/tags`
 A high resolution version of the classic Halo HUD. This version is based on content originally made by Jesse (Holy Crust).
 Note that not all elements of the HUD can be high resolution due to limitations in Halo PC/Halo Custom Edition.
-### `/extra/tags_mcc_compatibility`
+### `/extra/highres_hud/loc/{de,es,fr,it}/tags`
+Translated data for the highres HUD.
+### `/extra/mcc_compatibility/tags`
 Tags that account for the differences in how MCC interprets HUD scale. This makes it possible to build fully functioning maps for MCC using the base tagset.
 This is useful for comparing differences in engine behavior. For a proper bugfixed MCC tagset [mcc-ce-revised](https://github.com/Aerocatia/mcc-ce-revised) should be used instead.
-### `/extra/workarounds/tags_engine_workarounds`
+### `/extra/engine_workarounds/general/tags`
 These tags work around engine bugs in the Gearbox version of the game in order to force things to work closer to as intended.
 Maps built with these tags will not work correctly on less broken engines like MCC or if the bugs can be fixed through engine mods.
 Because of this it is not recommended to use these tags in maps that will not receive updates, and they will be removed from this repo
 when the related bugs can be fixed at the engine level. The workarounds in here are similar to the ones used in the "refined" tagset.
-### `/extra/workarounds/tags_highres_hud_workarounds`
+### `/extra/engine_workarounds/highres_hud/tags`
 Workarounds for the high resolution HUD tags. This includes 2X resolution HUD numbers (needs Chimera for waypoints to not look broken) and a workaround for the sniper ticks.
 
 ## Notice
