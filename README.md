@@ -51,6 +51,14 @@ when the related bugs can be fixed at the engine level. The workarounds in here 
 ### `/extra/engine_workarounds/highres_hud/tags`
 Workarounds for the high resolution HUD tags. This includes 2X resolution HUD numbers (needs Chimera for waypoints to not look broken) and a workaround for the sniper ticks.
 
+## Credits
+- Aerocatia
+- Holy Crust (Jesse)
+- Mortis
+- Snowy
+- Storm Lester
+- Yeonggille
+
 ## Notice
 This tagset does not use any tags directly copied from the Halo MCC CE editing tools. Instead all data is derived
 from the Gearbox version, and is assumed to remain under the Halo Custom Edition EULA.
