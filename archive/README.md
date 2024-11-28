@@ -35,6 +35,12 @@ characters\marine_armored\bitmaps\marine_legs_multipurpose.bitmap
 levels\b40\bitmaps\b40_metal panels generator bump.bitmap
 ```
 
+- Version of the unit meters drawn by Gearbox.
+```
+"ui\hud\bitmaps\combined\hud_unit_backgrounds.bitmap"
+"ui\hud\bitmaps\combined\hud_unit_meters.bitmap"
+```
+
 - At some point in 2002 Bungie themselves fixed the sniper scope to say 2x - 8x for later Xbox builds. This is the previous 2x - 10x texture from the earlier Xbox releases.
 ```
 ui\hud\bitmaps\sniper\hud_reticles_scope.bitmap
