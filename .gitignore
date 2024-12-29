@@ -20,6 +20,7 @@ data/**/*.jma
 data/**/*.jmo
 data/**/*.jms
 data/**/*.jxl
+data/**/*.pdn
 data/**/*.png
 data/**/*.psd
 data/**/*.sh
@@ -29,5 +30,6 @@ data/**/*.tiff
 maps/*.map
 
 shaders/*.bin
+shaders/*.enc
 
 !build.sh
