@@ -5,7 +5,7 @@ This is a list of known engine bugs related to the renderer, and are not caused 
 ## bitmap
 
 - The `monochrome` bitmap format is not supported.
-    - No fix.
+    - No full fix, but ringworld can enable some monochrome formats.
 - Bitmaps encoded as `p8 bump` are not supported.
     - No fix.
 
@@ -41,11 +41,11 @@ This is a list of known engine bugs related to the renderer, and are not caused 
 ## shader_transparent_chicago, shader_transparent_chicago_extended
 
 - This shader will fail to render if the `framebuffer blend function` is set to `multiply` while the `framebuffer fade mode` is set to `none`.
-    - No fix. This can be worked around in tag data by setting the `framebuffer fade mode` to `fade when perpendicular` and having a second copy of the shader referenced as an extra layer that is set to `fade when parallel`.
+    - Fixed with Chimera.
 
 ## shader_transparent_generic
 
-- This tag group is not implemented.
+- Implemented in ringworld.
 
 ## shader_transparent_water
 
@@ -55,8 +55,8 @@ This is a list of known engine bugs related to the renderer, and are not caused 
 ## unit_hud_interface, weapon_hud_interface
 
 - Meters do not fade to another color.
-    - No fix. Can be faked with color meter bitmaps. These only work on the Gearbox engines.
+    - Fixed in ringworld. Can also be faked with color meter bitmaps. These only work with the Gearbox meter channel order.
 - Meter state blending is imprecise, causing pixels to be enabled when they should not be (and vice versa).
     - No fix. Exact meter values should still be used, however you need 1px of padding around all meter elements, including the edge. This requirement is why the Xbox HUD can not be directly used, as the elements are too small to include the padding.
 - Multitexture overlays do not blend correctly.
-    - No fix. The sniper ticks can be made to render by changing the bitmaps and blending settings, however this configuration will not work on a Xbox-matching rendering engine.
+    - Fixed with Chimera.

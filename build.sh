@@ -44,13 +44,9 @@ Options:
   -x            Make extended resource maps for Custom Edition when using -n.
                 Warning: Campaign maps built this way will ONLY work with
                 these exact resource maps.
-  -z            Use BROKEN tags to work around incorrect tag functionality on the
-                Gearbox engines. These tags rely on gearbox engine bugs and *will*
-                break on an engine or mod that fixes them, like MCC running in
-                Custom Edition mode. If we ever escape this purgatory where MCC is
-                broken and worse feature-wise while the Gearbox port is also still
-                riddled with bugs, then this option and the associated tags should
-                be blasted into the sun."
+  -z            Use tags to work-around incorrect tag functionality on the
+                Gearbox engines. Also bypasses the in-game update check.
+                These tags are safe to use now :)"
 
 # Scenario basenames.
 CAMPAIGN=('a10' 'a30' 'a50' 'b30' 'b40' 'c10' 'c20' 'c40' 'd20' 'd40')
