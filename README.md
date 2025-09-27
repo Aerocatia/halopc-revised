@@ -7,14 +7,26 @@ This project aims to provide an updated drop-in replacement for the official HEK
 This project does not set out to make changes that affect the playstyle or atmosphere of the game.
 Instead the goal is to fix bugs that occurred during the Halo PC porting process.
 
+This tagset requires a mod like [Chimera](https://github.com/SnowyMouse/chimera) to work correctly.
+The following non-stock features are needed for full support:
+
+- Support for monochrome bitmaps in A8Y8 or Y8 format.
+- Support for the `0.5 hud scale` flag that was added to MCC
+- Support for the custom `force hud use highres scale` flag
+
+It is possible to build maps using this tagset that can also run on an unmodded stock game, provided all included bitmaps are only loaded from `bitmaps.map`.
+In this case the client can use the original versions that do not need extra features provided by mods as long as the original `bitmaps.map` is used.
+
+Note that due to `tool.exe` bugs there can be issues when building against resource maps made from tags other than the ones included in this tagset.
+It is recommended to either use custom resource maps with matching tags, or used a modified `tool.exe` executable that does not have such bugs.
+Feel free to ask @Aerocatia (same name on discord) for more info.
+
 ## Difference from Halo CE "Refined"
-Unlike the Refined tagset, by default this asset release does not use workarounds or hacks to try and
+Unlike the Refined tagset, this tagset release does not use workarounds or hacks to try and
 imitate the visuals of the Xbox version on Halo PC's buggy engine, instead this release
-fixes bugs with the Halo PC content while keeping within the intended tag features of Halo PC.
+fixes bugs with the Halo PC content while mostly keeping within the intended tag features of Halo PC.
 
-The benefit to this is the tags will still work as intended when run on an engine that fixes
-the core engine issues, be it [MCC](https://store.steampowered.com/app/976730/Halo_The_Master_Chief_Collection/) or Halo Custom Edition with [CEnshine](https://github.com/Sledmine/censhine) and [Chimera](https://github.com/SnowyMouse/chimera) Installed.
-
+This allows these tags to be a drop-in replacment for other tags that expect the original tags released by Gearbox.
 As a result this tagset keeps the Halo PC `shader_transparent_chicago` shaders that stand-in for the lack of `shader_transparent_generic` support.
 
 ## Engine support
@@ -23,9 +35,10 @@ Cache files (maps) can be compiled for the following engines from these tags:
 - Halo PC (2003 retail)
 - Halo Trial
 - Halo Custom Edition
-- Halo: The Master Chief Collection
 
 ## Directory Layout
+### `/archive`
+Stuff we do not use anymore, but useful to keep.
 ### `/data`
 HSC script source for Halo PC.
 ### `/tags`
@@ -35,21 +48,10 @@ The translated game data for Halo PC.
 ### `/extra/highres_bitmaps/tags`
 Faithful custom high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
 Also contains slightly higher resolution versions of bitmaps made by bungie that were used elsewhere (Xbox 1749, other parts of the final tagset).
-### `/extra/highres_hud/tags`
-A high resolution version of the classic Halo HUD. This version is based on content originally made by Jesse (Holy Crust).
-Note that not all elements of the HUD can be high resolution due to limitations in Halo PC/Halo Custom Edition.
-### `/extra/highres_hud/loc/{de,es,fr,it}/tags`
-Translated data for the highres HUD.
-### `/extra/mcc_compatibility/tags`
-Tags that account for the differences in how MCC interprets HUD scale. This makes it possible to build fully functioning maps for MCC using the base tagset.
-This is useful for comparing differences in engine behavior. For a proper bugfixed MCC tagset [mcc-ce-revised](https://github.com/Aerocatia/mcc-ce-revised) should be used instead.
-### `/extra/engine_workarounds/general/tags`
-These tags work around engine bugs in the Gearbox version of the game in order to force things to work closer to as intended.
-Maps built with these tags will not work correctly on less broken engines like MCC or if the bugs can be fixed through engine mods.
-Because of this it is not recommended to use these tags in maps that will not receive updates, and they will be removed from this repo
-when the related bugs can be fixed at the engine level. The workarounds in here are similar to the ones used in the "refined" tagset.
-### `/extra/engine_workarounds/highres_hud/tags`
-Workarounds for the high resolution HUD tags. This includes 2X resolution HUD numbers (needs Chimera for waypoints to not look broken) and a workaround for the sniper ticks.
+### `/extra/skip_update_check/tags`
+Tags that change ui.map to bypass the Halo PC update check.
+### `/extra/xbox_weapon_stats/tags`
+Restore Xbox weapon stats. This will break netcode compatibility with stock maps, and should only be used in campaign or custom MP maps.
 
 ## Credits
 - Aerocatia
@@ -61,4 +63,4 @@ Workarounds for the high resolution HUD tags. This includes 2X resolution HUD nu
 
 ## Notice
 This tagset does not use any tags directly copied from the Halo MCC CE editing tools. Instead all data is derived
-from the Gearbox version, and is assumed to remain under the Halo Custom Edition EULA.
+from the Gearbox version or custom made, and is assumed to remain under the Halo Custom Edition EULA.

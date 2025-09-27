@@ -15,8 +15,6 @@ BUILD_CAMPAIGN=1
 USE_EXISTING_RESOURCE_MAPS=0
 USE_TAG_SCRIPT_SOURCE=0
 USE_HD_BITMAPS=0
-USE_HD_HUD=0
-USE_DIRTY_TAG_WORKAROUNDS=0
 INVADER_QUIET=0
 
 echoerr() { printf "%s\n" "$*" >&2; }
@@ -29,7 +27,6 @@ Options:
   -g <engine>   Engine target (required) Valid options are: gbx-custom,
                 gbx-demo, gbx-retail.
   -h            Show this help text.
-  -j            Use the high resolution Halo HUD.
   -l <lang>     Build a localization. Valid options are: de, es, fr, it, jp, kr,
                 tw, en (default).
   -m <dir>      Change the output maps directory.
@@ -43,10 +40,7 @@ Options:
   -t            Prefix an extra tags directory (can be used more than once).
   -x            Make extended resource maps for Custom Edition when using -n.
                 Warning: Campaign maps built this way will ONLY work with
-                these exact resource maps.
-  -z            Use tags to work-around incorrect tag functionality on the
-                Gearbox engines. Also bypasses the in-game update check.
-                These tags are safe to use now :)"
+                these exact resource maps."
 
 # Scenario basenames.
 CAMPAIGN=('a10' 'a30' 'a50' 'b30' 'b40' 'c10' 'c20' 'c40' 'd20' 'd40')
@@ -93,9 +87,6 @@ while getopts ":bd:g:hjl:m:npqrst:xz" arg; do
             echo "$__usage"
             exit
         ;;
-        j)
-            USE_HD_HUD=1
-        ;;
         l)
             if [[ $lang_set != 1 ]]; then
                 case "${OPTARG}" in de) ;& en) ;& es) ;& fr) ;& it) ;& jp) ;& kr) ;& tw)
@@ -136,9 +127,6 @@ while getopts ":bd:g:hjl:m:npqrst:xz" arg; do
         ;;
         x)
             BUILD_EXTENDED_CE_RESOURCE_MAPS=1
-        ;;
-        z)
-            USE_DIRTY_TAG_WORKAROUNDS=1
         ;;
         *)
             echoerr "Error: Incorrect usage. use -h for supported options"
@@ -205,37 +193,13 @@ BUILD_ARGS=("--maps" "${MAPS_DIR}" "--game-engine" "$TARGET_ENGINE")
 
 #
 # Build tags directory arguments.
-# Load order matters here, tags for the the HD HUD must be loaded over top of tags
-# for things like engine workarounds.
+# Load order matters here.
 #
 
 # User provided tags directories.
 for ET_PATH in "${EXTRA_TAGS_DIRS[@]}"; do
     BUILD_ARGS+=("--tags" "${ET_PATH}")
 done
-
-# localized bitmaps for HD HUD.
-if [[ $USE_HD_HUD == 1 ]]; then
-    case "${TARGET_LANGUAGE}" in de) ;& es) ;& fr) ;& it)
-            BUILD_ARGS+=("--tags" "extra/highres_hud/loc/${TARGET_LANGUAGE}/tags")
-        ;;
-    esac
-fi
-
-# Workarounds for HD HUD.
-if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 && $USE_HD_HUD == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/engine_workarounds/highres_hud/tags")
-fi
-
-# Main tags for HD HUD.
-if [[ $USE_HD_HUD == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/highres_hud/tags")
-fi
-
-# Base Gearbox tag workarounds.
-if [[ $USE_DIRTY_TAG_WORKAROUNDS == 1 ]]; then
-    BUILD_ARGS+=("--tags" "extra/engine_workarounds/general/tags")
-fi
 
 # Simple HD bitmaps.
 if [[ $USE_HD_BITMAPS == 1 ]]; then
