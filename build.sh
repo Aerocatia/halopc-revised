@@ -27,7 +27,7 @@ Options:
   -b            Use high resolution transparency and rasterizer bitmaps.
   -d <dir>      Change the data directory used for scripts.
   -g <engine>   Engine target (required) Valid options are: gbx-custom,
-                gbx-demo, gbx-retail, mcc-cea.
+                gbx-demo, gbx-retail.
   -h            Show this help text.
   -j            Use the high resolution Halo HUD.
   -l <lang>     Build a localization. Valid options are: de, es, fr, it, jp, kr,
@@ -77,9 +77,11 @@ while getopts ":bd:g:hjl:m:npqrst:xz" arg; do
                 gbx-demo)
                 ;&
                 gbx-retail)
-                ;&
-                mcc-cea)
                     TARGET_ENGINE="${OPTARG}"
+                ;;
+                mcc-cea)
+                    echoerr "Error: mcc-cea is not directly supported as a build target. build for gbx-custom instead"
+                    exit 1
                 ;;
                 *)
                     echoerr "Error: Unknown target engine \"$OPTARG\""
@@ -228,16 +230,6 @@ fi
 # Main tags for HD HUD.
 if [[ $USE_HD_HUD == 1 ]]; then
     BUILD_ARGS+=("--tags" "extra/highres_hud/tags")
-fi
-
-# Load these in if building for MCC.
-if [[ "$TARGET_ENGINE" == "mcc-cea" ]]; then
-    if [[ $USE_HD_HUD == 1 ]]; then
-        echoerr "Error: Support for the HD HUD on the MCC build target is not implemented in this tagset"
-        exit 1
-    else
-        BUILD_ARGS+=("--tags" "extra/mcc_compatibility/tags")
-    fi
 fi
 
 # Base Gearbox tag workarounds.
