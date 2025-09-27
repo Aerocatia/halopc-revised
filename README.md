@@ -7,6 +7,15 @@ This project aims to provide an updated drop-in replacement for the official HEK
 This project does not set out to make changes that affect the playstyle or atmosphere of the game.
 Instead the goal is to fix bugs that occurred during the Halo PC porting process.
 
+## Difference from Halo CE "Refined"
+Unlike the Refined tagset, this tagset release does not use workarounds or hacks to try and
+imitate the visuals of the Xbox version on Halo PC's buggy engine, instead this release
+fixes bugs with the Halo PC content while mostly keeping within the intended tag features of Halo PC (see requirements below).
+
+This allows these tags to be a drop-in replacment for other tags that expect the original tags released by Gearbox.
+As a result this tagset keeps the Halo PC `shader_transparent_chicago` shaders that stand-in for the lack of `shader_transparent_generic` support.
+
+## Requirements
 This tagset requires a mod like [Chimera](https://github.com/SnowyMouse/chimera) to work correctly.
 The following non-stock features are needed for full support:
 
@@ -17,17 +26,11 @@ The following non-stock features are needed for full support:
 It is possible to build maps using this tagset that can also run on an unmodded stock game, provided all included bitmaps are only loaded from `bitmaps.map`.
 In this case the client can use the original versions that do not need extra features provided by mods as long as the original `bitmaps.map` is used.
 
-Note that due to `tool.exe` bugs there can be issues when building against resource maps made from tags other than the ones included in this tagset.
-It is recommended to either use custom resource maps with matching tags, or used a modified `tool.exe` executable that does not have such bugs.
-Feel free to ask @Aerocatia (same name on discord) for more info.
-
-## Difference from Halo CE "Refined"
-Unlike the Refined tagset, this tagset release does not use workarounds or hacks to try and
-imitate the visuals of the Xbox version on Halo PC's buggy engine, instead this release
-fixes bugs with the Halo PC content while mostly keeping within the intended tag features of Halo PC.
-
-This allows these tags to be a drop-in replacment for other tags that expect the original tags released by Gearbox.
-As a result this tagset keeps the Halo PC `shader_transparent_chicago` shaders that stand-in for the lack of `shader_transparent_generic` support.
+Note that due to `tool.exe` bugs there can be issues when building against resource maps made using tags other than the ones included in this tagset.
+This includes the stock resource maps that come with the game.
+It is recommended to either use custom resource maps with matching tags, or use a modified `tool.exe` executable that does not have such bugs.
+If any version `tool.exe` is used to build maps from this tagset, please run [tool-squisher](https://github.com/Aerocatia/tool-squisher) on them to ensure data correctness.
+Feel free to ask [@Aerocatia](https://github.com/Aerocatia) (same name on discord) for more info.
 
 ## Engine support
 Cache files (maps) can be compiled for the following engines from these tags:
