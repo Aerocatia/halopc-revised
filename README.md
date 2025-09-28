@@ -22,6 +22,7 @@ The following non-stock features are needed for full support:
 - Support for monochrome bitmaps in A8Y8 or Y8 format.
 - Support for the `0.5 hud scale` flag that was added to MCC
 - Support for the custom `force hud use highres scale` flag
+- Support for shader_model `use xbox multipurpose channel order` flag (by default only so using the diffuse as a multi does the same thing it did on Xbox)
 
 It is possible to build maps using this tagset that can also run on an unmodded stock game, provided all included bitmaps are only loaded from `bitmaps.map`.
 In this case the client can use the original versions that do not need extra features provided by mods as long as the original `bitmaps.map` is used.
