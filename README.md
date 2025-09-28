@@ -53,6 +53,10 @@ Faithful custom high resolution versions of certain transparency bitmaps, like d
 Also contains slightly higher resolution versions of bitmaps made by bungie that were used elsewhere (Xbox 1749, other parts of the final tagset).
 ### `/extra/skip_update_check/tags`
 Tags that change ui.map to bypass the Halo PC update check.
+### `/extra/xbox_order_multipurpose_bitmaps/tags
+Multipurpose bitmaps in Xbox channel order with shader_model tags that have the `xbox multipurpose channel order` flag enabled.
+Note that these are incompatible with stock Halo resource maps, so take care that there are no accidental depedencies due to tool bugs.
+Many custom tags made for Halo Custom Edition expect stock tags in Gearbox order, however more modern custom tags for MCC expect them in Xbox order.
 ### `/extra/xbox_weapon_stats/tags`
 Restore Xbox weapon stats. This will break netcode compatibility with stock maps, and should only be used in campaign or custom MP maps.
 
