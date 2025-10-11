@@ -52,6 +52,8 @@ The translated game data for Halo PC.
 ### `/extra/highres_bitmaps/tags`
 Faithful custom high resolution versions of certain transparency bitmaps, like doors, control panels, and the KOTH Hill.
 Also contains slightly higher resolution versions of bitmaps made by bungie that were used elsewhere (Xbox 1749, other parts of the final tagset).
+### `/extra/retail_demo_compatibility/tags`
+Tags needed for correct netcode sync when building for Retail Halo PC or Halo Trial. Invader will apply these changes automatically, but tool.exe does not.
 ### `/extra/skip_update_check/tags`
 Tags that change ui.map to bypass the Halo PC update check.
 ### `/extra/xbox_order_multipurpose_bitmaps/tags
