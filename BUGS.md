@@ -5,9 +5,9 @@ This is an imcomplete list of known engine bugs related to the renderer, and are
 ## bitmap
 
 - The `monochrome` bitmap format is not supported.
-    - Chimera or Ringworld can enable A8 and A8Y8 as these are supported by d3d9, however A8 and AY8 are still unsupported. Ringhopper's bitmap command can force supported formats when making monochrome tags.
+    - Fixed with Chimera.
 - Bitmaps encoded as `p8 bump` are not supported.
-    - No fix.
+    - Fixed with Chimera.
 
 ## decal
 

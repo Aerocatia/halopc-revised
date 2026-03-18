@@ -18,7 +18,7 @@ Cache files (maps) can be compiled for the following engines from these tags, pr
 No engine bug workarounds are used in these tags. A mod like [Chimera](https://github.com/SnowyMouse/chimera) is required for the tags to work correctly.
 The following non-stock features are needed for full support:
 
-- Support for monochrome bitmaps in A8Y8 or Y8 format.
+- Support for monochrome bitmaps
 - Support for the `0.5 hud scale` bitmap flag that was added to MCC
 - Support for the custom `force hud use highres scale` bitmap flag
 - Support for shader_model `use xbox multipurpose channel order` flag (by default only so using the diffuse as a multi does the same thing it did on Xbox)
